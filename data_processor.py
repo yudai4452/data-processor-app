@@ -212,7 +212,7 @@ if st.sidebar.button("処理開始"):
             st.success(f"データ処理が完了し、{excel_file_name} に保存されました。")
 
             # GitHubにファイルをアップロード
-            repo_name = "your-username/your-repo-name"  # リポジトリ名を指定
+            repo_name = "yudai4452/data-processor-app"  # リポジトリ名を指定
             commit_message = f"Add data for {date_str}"
 
             # CSVファイルのパス
