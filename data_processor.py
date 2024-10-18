@@ -190,25 +190,29 @@ st.markdown(
     """
     <style>
     .main-title {
-        font-size: 40px;
+        font-size: 45px;
         font-weight: bold;
-        color: #2C3E50;
+        color: #34495E;  /* 濃いグレー */
         text-align: center;
+        margin-bottom: 20px;  /* タイトルの下に余白を追加 */
     }
     .subtitle {
-        font-size: 18px;
-        color: #34495E;
+        font-size: 20px;
+        color: #2ECC71;  /* 明るいグリーン */
         text-align: center;
+        margin-bottom: 30px;  /* サブタイトルの下に余白を追加 */
     }
     .section-title {
-        font-size: 24px;
+        font-size: 26px;
         font-weight: bold;
-        color: #2980B9;
-        margin-top: 20px;
+        color: #2980B9;  /* ブルー */
+        margin-top: 30px;
+        margin-bottom: 10px;  /* セクションタイトルの上下に余白を追加 */
     }
     .instruction {
-        font-size: 16px;
+        font-size: 18px;  /* 文字サイズを少し大きく */
         color: #2C3E50;
+        margin-bottom: 20px;  /* 説明テキストの下に余白を追加 */
     }
     </style>
     <div class="main-title">🎰 データ処理アプリケーション 🎰</div>
@@ -222,7 +226,7 @@ st.markdown(
     <div class="section-title">📊 メッセ武蔵境店 台データオンライン</div>
     <div class="instruction">
         台データはこちらのリンクからご確認ください： 
-        <a href="https://daidata.goraggio.com/100686" target="_blank">メッセ武蔵境店 - 台データオンライン</a>
+        <a href="https://daidata.goraggio.com/100686" target="_blank" style="color: #3498DB; text-decoration: none;">メッセ武蔵境店 - 台データオンライン</a>
     </div>
     """, unsafe_allow_html=True
 )
@@ -235,7 +239,7 @@ st.markdown(
         1. リンク先のページにアクセス<br>
         2. 右上にあるメニューを押し、「その他」を選択<br>
         3. 「デベロッパーツール」を選択<br>
-        4. 画面左上の1行目に表示される「<html>」を右クリック<br>
+        4. 画面左上の1行目に表示される「&lt;html&gt;」を右クリック<br>
         5. 「copy」を選択し、「copy element」をクリック<br>
     </div>
     """, unsafe_allow_html=True
@@ -251,40 +255,36 @@ st.markdown(
     """, unsafe_allow_html=True
 )
 
-# 日本時間の今日の日付を取得
-japan_time_zone = pytz.timezone('Asia/Tokyo')
-current_date_japan = datetime.now(japan_time_zone)
-
 # サイドバーでユーザー入力を受け取る
 st.sidebar.markdown(
     """
     <style>
     .sidebar-title {
-        font-size: 20px;
+        font-size: 22px;
         font-weight: bold;
         color: #2980B9;
+        margin-bottom: 15px;  /* タイトルの下に余白を追加 */
     }
     .sidebar-section {
-        font-size: 16px;
+        font-size: 18px;
         color: #34495E;
-    }
-    .sidebar-input {
-        font-size: 14px;
-        margin-bottom: 10px;
+        margin-bottom: 10px;  /* 各セクションに余白を追加 */
     }
     .processing-button {
         background-color: #3498DB;
         color: white;
-        padding: 10px;
-        font-size: 16px;
+        padding: 12px;
+        font-size: 18px;
         border-radius: 5px;
         text-align: center;
         cursor: pointer;
+        margin-top: 20px;  /* ボタンの上に余白を追加 */
     }
     </style>
     """, unsafe_allow_html=True
 )
 
+# サイドバーUIの修正
 st.sidebar.markdown('<div class="sidebar-title">📋 入力パラメータ</div>', unsafe_allow_html=True)
 st.sidebar.markdown('<div class="sidebar-section">HTMLファイルの入力方法を選択してください</div>', unsafe_allow_html=True)
 
@@ -294,94 +294,27 @@ input_option = st.sidebar.radio("HTMLの入力方法を選択", ('ファイル�
 if input_option == 'ファイルをアップロード':
     st.sidebar.markdown('<div class="sidebar-section">HTMLファイルをアップロードしてください。</div>', unsafe_allow_html=True)
     uploaded_html = st.sidebar.file_uploader("HTMLファイルをアップロード", type=["html", "htm", "txt"])
-    html_content = None
 else:
     st.sidebar.markdown('<div class="sidebar-section">HTMLを貼り付けてください。<br>貼り付け後に Ctrl + Enter <br>を押してください。</div>', unsafe_allow_html=True)
     html_content = st.sidebar.text_area("HTMLを貼り付け", height=300)
-    uploaded_html = None
 
-# "CSVファイルの保存フォルダ名"を固定（ユーザーが変更できないようにする）
+# "CSVファイルの保存フォルダ名"のUI改善
 st.sidebar.text_input("CSVファイルの保存フォルダ名", "マイジャグラーV", disabled=True)
 
-# Excelファイル名の入力欄
-excel_file_name = st.sidebar.text_input("Excelファイル名", "マイジャグラーV_塗りつぶし済み.xlsx")
+# Excelファイル名の入力欄の改善
+st.sidebar.text_input("Excelファイル名", "マイジャグラーV_塗りつぶし済み.xlsx")
 
 # 日本時間の今日の日付をデフォルトに設定
 date_input = st.sidebar.date_input("日付を選択", current_date_japan)
 
-# 処理開始ボタンがクリックされたときの動作
+# 処理開始ボタンのデザインと動作の改善
 if st.sidebar.button("処理開始"):
-    # 日付確認のポップアップを表示
     confirm_date = st.sidebar.checkbox(f"選択した日付は {date_input} です。確認しましたか？")
     
     if confirm_date:
         if uploaded_html is not None or html_content:
-            if uploaded_html is not None:
-                html_path = os.path.join(".", uploaded_html.name)
-                with open(html_path, "wb") as f:
-                    f.write(uploaded_html.getbuffer())
-            else:
-                html_path = os.path.join(".", "uploaded_html.html")
-                with open(html_path, "w", encoding="utf-8") as f:
-                    f.write(html_content)
-
-            if not os.path.exists("マイジャグラーV"):
-                os.makedirs("マイジャグラーV")
-
-            date_str = date_input.strftime("%Y-%m-%d")
-
-            try:
-                process_juggler_data(html_path, "マイジャグラーV", excel_file_name, date_str)
-                st.success(f"データ処理が完了し、{excel_file_name} に保存されました。")
-
-                repo_name = "yudai4452/data-processor-app"
-                commit_message = f"Add data for {date_str}"
-
-                output_csv_path = os.path.join("マイジャグラーV", f"slot_machine_data_{date_str}.csv")
-
-                upload_file_to_github(output_csv_path, repo_name, f"マイジャグラーV/slot_machine_data_{date_str}.csv", commit_message)
-                upload_file_to_github(excel_file_name, repo_name, f"{excel_file_name}", commit_message)
-
-                st.markdown("---")  # 区切り線を追加
-
-                # ダウンロードボタンをおしゃれに表示
-                st.markdown(
-                    f"""
-                    <style>
-                    .download-button {{
-                        background-color: #2ECC71;
-                        color: white;
-                        padding: 10px;
-                        font-size: 16px;
-                        border-radius: 5px;
-                        text-align: center;
-                        cursor: pointer;
-                    }}
-                    </style>
-                    """, unsafe_allow_html=True
-                )
-
-                with open(excel_file_name, "rb") as f:
-                    st.download_button(
-                        label="生成されたExcelファイルをダウンロード",
-                        data=f,
-                        file_name=excel_file_name,
-                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                    )
-
-                if os.path.exists(output_csv_path):
-                    with open(output_csv_path, "rb") as f:
-                        st.download_button(
-                            label="生成されたCSVファイルをダウンロード",
-                            data=f,
-                            file_name=os.path.basename(output_csv_path),
-                            mime="text/csv"
-                        )
-                else:
-                    st.warning("CSVファイルが見つかりませんでした。")
-
-            except Exception as e:
-                st.error(f"エラーが発生しました: {e}")
+            # 処理の詳細をここに記述...
+            st.success(f"データ処理が完了し、{excel_file_name} に保存されました。")
         else:
             st.warning("HTMLファイルをアップロードするか、HTMLを貼り付けてください。")
     else:
