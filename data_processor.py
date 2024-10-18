@@ -300,79 +300,89 @@ else:
     html_content = st.sidebar.text_area("HTMLを貼り付け", height=300)
     uploaded_html = None
 
-# その他の入力項目
-output_csv_dir = st.sidebar.text_input("CSVファイルの保存フォルダ名", "マイジャグラーV")
+# "CSVファイルの保存フォルダ名"を固定（ユーザーが変更できないようにする）
+st.sidebar.text_input("CSVファイルの保存フォルダ名", "マイジャグラーV", disabled=True)
+
+# Excelファイル名の入力欄
 excel_file_name = st.sidebar.text_input("Excelファイル名", "マイジャグラーV_塗りつぶし済み.xlsx")
-date_input = st.sidebar.date_input("日付を選択", datetime.today())
 
-# 処理開始ボタンのスタイル
+# 日本時間の今日の日付をデフォルトに設定
+date_input = st.sidebar.date_input("日付を選択", current_date_japan)
+
+# 処理開始ボタンがクリックされたときの動作
 if st.sidebar.button("処理開始"):
-    if uploaded_html is not None or html_content:
-        if uploaded_html is not None:
-            html_path = os.path.join(".", uploaded_html.name)
-            with open(html_path, "wb") as f:
-                f.write(uploaded_html.getbuffer())
-        else:
-            html_path = os.path.join(".", "uploaded_html.html")
-            with open(html_path, "w", encoding="utf-8") as f:
-                f.write(html_content)
+    # 日付確認のポップアップを表示
+    confirm_date = st.sidebar.checkbox(f"選択した日付は {date_input} です。確認しましたか？")
+    
+    if confirm_date:
+        if uploaded_html is not None or html_content:
+            if uploaded_html is not None:
+                html_path = os.path.join(".", uploaded_html.name)
+                with open(html_path, "wb") as f:
+                    f.write(uploaded_html.getbuffer())
+            else:
+                html_path = os.path.join(".", "uploaded_html.html")
+                with open(html_path, "w", encoding="utf-8") as f:
+                    f.write(html_content)
 
-        if not os.path.exists(output_csv_dir):
-            os.makedirs(output_csv_dir)
+            if not os.path.exists("マイジャグラーV"):
+                os.makedirs("マイジャグラーV")
 
-        date_str = date_input.strftime("%Y-%m-%d")
+            date_str = date_input.strftime("%Y-%m-%d")
 
-        try:
-            process_juggler_data(html_path, output_csv_dir, excel_file_name, date_str)
-            st.success(f"データ処理が完了し、{excel_file_name} に保存されました。")
+            try:
+                process_juggler_data(html_path, "マイジャグラーV", excel_file_name, date_str)
+                st.success(f"データ処理が完了し、{excel_file_name} に保存されました。")
 
-            repo_name = "yudai4452/data-processor-app"
-            commit_message = f"Add data for {date_str}"
+                repo_name = "yudai4452/data-processor-app"
+                commit_message = f"Add data for {date_str}"
 
-            output_csv_path = os.path.join(output_csv_dir, f"slot_machine_data_{date_str}.csv")
+                output_csv_path = os.path.join("マイジャグラーV", f"slot_machine_data_{date_str}.csv")
 
-            upload_file_to_github(output_csv_path, repo_name, f"マイジャグラーV/slot_machine_data_{date_str}.csv", commit_message)
-            upload_file_to_github(excel_file_name, repo_name, f"{excel_file_name}", commit_message)
+                upload_file_to_github(output_csv_path, repo_name, f"マイジャグラーV/slot_machine_data_{date_str}.csv", commit_message)
+                upload_file_to_github(excel_file_name, repo_name, f"{excel_file_name}", commit_message)
 
-            st.markdown("---")  # 区切り線を追加
+                st.markdown("---")  # 区切り線を追加
 
-            # ダウンロードボタンをおしゃれに表示
-            st.markdown(
-                f"""
-                <style>
-                .download-button {{
-                    background-color: #2ECC71;
-                    color: white;
-                    padding: 10px;
-                    font-size: 16px;
-                    border-radius: 5px;
-                    text-align: center;
-                    cursor: pointer;
-                }}
-                </style>
-                """, unsafe_allow_html=True
-            )
-
-            with open(excel_file_name, "rb") as f:
-                st.download_button(
-                    label="生成されたExcelファイルをダウンロード",
-                    data=f,
-                    file_name=excel_file_name,
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                # ダウンロードボタンをおしゃれに表示
+                st.markdown(
+                    f"""
+                    <style>
+                    .download-button {{
+                        background-color: #2ECC71;
+                        color: white;
+                        padding: 10px;
+                        font-size: 16px;
+                        border-radius: 5px;
+                        text-align: center;
+                        cursor: pointer;
+                    }}
+                    </style>
+                    """, unsafe_allow_html=True
                 )
 
-            if os.path.exists(output_csv_path):
-                with open(output_csv_path, "rb") as f:
+                with open(excel_file_name, "rb") as f:
                     st.download_button(
-                        label="生成されたCSVファイルをダウンロード",
+                        label="生成されたExcelファイルをダウンロード",
                         data=f,
-                        file_name=os.path.basename(output_csv_path),
-                        mime="text/csv"
+                        file_name=excel_file_name,
+                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                     )
-            else:
-                st.warning("CSVファイルが見つかりませんでした。")
 
-        except Exception as e:
-            st.error(f"エラーが発生しました: {e}")
+                if os.path.exists(output_csv_path):
+                    with open(output_csv_path, "rb") as f:
+                        st.download_button(
+                            label="生成されたCSVファイルをダウンロード",
+                            data=f,
+                            file_name=os.path.basename(output_csv_path),
+                            mime="text/csv"
+                        )
+                else:
+                    st.warning("CSVファイルが見つかりませんでした。")
+
+            except Exception as e:
+                st.error(f"エラーが発生しました: {e}")
+        else:
+            st.warning("HTMLファイルをアップロードするか、HTMLを貼り付けてください。")
     else:
-        st.warning("HTMLファイルをアップロードするか、HTMLを貼り付けてください。")
+        st.warning("日付の確認を行ってください。")
