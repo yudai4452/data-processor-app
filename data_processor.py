@@ -219,10 +219,10 @@ if st.sidebar.button("処理開始"):
             output_csv_path = os.path.join(output_csv_dir, f"slot_machine_data_{date_str}.csv")
 
             # CSVファイルのアップロード
-            upload_file_to_github(output_csv_path, repo_name, f"data/csv/slot_machine_data_{date_str}.csv", commit_message)
+            upload_file_to_github(output_csv_path, repo_name, f"data-processor-app/マイジャグラーV/slot_machine_data_{date_str}.csv", commit_message)
 
             # Excelファイルのアップロード
-            upload_file_to_github(excel_file_name, repo_name, f"data/excel/{excel_file_name}", commit_message)
+            upload_file_to_github(excel_file_name, repo_name, f"data-processor-app/{excel_file_name}", commit_message)
 
             # ダウンロードボタンの表示
             with open(excel_file_name, "rb") as f:
