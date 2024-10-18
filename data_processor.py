@@ -251,60 +251,103 @@ st.markdown(
 )
 
 # サイドバーでユーザー入力を受け取る
-st.sidebar.header("入力パラメータ")
+st.sidebar.markdown(
+    """
+    <style>
+    .sidebar-title {
+        font-size: 20px;
+        font-weight: bold;
+        color: #2980B9;
+    }
+    .sidebar-section {
+        font-size: 16px;
+        color: #34495E;
+    }
+    .sidebar-input {
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+    .processing-button {
+        background-color: #3498DB;
+        color: white;
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 5px;
+        text-align: center;
+        cursor: pointer;
+    }
+    </style>
+    """, unsafe_allow_html=True
+)
+
+st.sidebar.markdown('<div class="sidebar-title">📋 入力パラメータ</div>', unsafe_allow_html=True)
+st.sidebar.markdown('<div class="sidebar-section">HTMLファイルの入力方法を選択してください</div>', unsafe_allow_html=True)
+
+# ファイルのアップロードまたはHTMLの貼り付けオプションを提供
 input_option = st.sidebar.radio("HTMLの入力方法を選択", ('ファイルをアップロード', 'HTMLを貼り付け'))
 
 if input_option == 'ファイルをアップロード':
+    st.sidebar.markdown('<div class="sidebar-section">HTMLファイルをアップロードしてください。</div>', unsafe_allow_html=True)
     uploaded_html = st.sidebar.file_uploader("HTMLファイルをアップロード", type=["html", "htm", "txt"])
     html_content = None
 else:
+    st.sidebar.markdown('<div class="sidebar-section">HTMLを貼り付けてください。貼り付け後に Ctrl + Enter を押してください。</div>', unsafe_allow_html=True)
     html_content = st.sidebar.text_area("HTMLを貼り付け", height=300)
     uploaded_html = None
 
+# その他の入力項目
 output_csv_dir = st.sidebar.text_input("CSVファイルの保存フォルダ名", "マイジャグラーV")
 excel_file_name = st.sidebar.text_input("Excelファイル名", "マイジャグラーV_塗りつぶし済み.xlsx")
 date_input = st.sidebar.date_input("日付を選択", datetime.today())
 
-# 処理開始ボタンがクリックされたときの動作
+# 処理開始ボタンのスタイル
 if st.sidebar.button("処理開始"):
     if uploaded_html is not None or html_content:
-        # アップロードされたファイルを保存
         if uploaded_html is not None:
             html_path = os.path.join(".", uploaded_html.name)
             with open(html_path, "wb") as f:
                 f.write(uploaded_html.getbuffer())
         else:
-            # ユーザーが貼り付けたHTMLをファイルとして保存
             html_path = os.path.join(".", "uploaded_html.html")
             with open(html_path, "w", encoding="utf-8") as f:
                 f.write(html_content)
 
-        # 出力ディレクトリを作成
         if not os.path.exists(output_csv_dir):
             os.makedirs(output_csv_dir)
 
-        # 日付を文字列に変換
         date_str = date_input.strftime("%Y-%m-%d")
 
-        # 一連の処理を実行
         try:
             process_juggler_data(html_path, output_csv_dir, excel_file_name, date_str)
             st.success(f"データ処理が完了し、{excel_file_name} に保存されました。")
 
-            # GitHubにファイルをアップロード
-            repo_name = "yudai4452/data-processor-app"  # リポジトリ名を指定
+            repo_name = "yudai4452/data-processor-app"
             commit_message = f"Add data for {date_str}"
 
-            # CSVファイルのパス
             output_csv_path = os.path.join(output_csv_dir, f"slot_machine_data_{date_str}.csv")
 
-            # CSVファイルのアップロード
             upload_file_to_github(output_csv_path, repo_name, f"マイジャグラーV/slot_machine_data_{date_str}.csv", commit_message)
-
-            # Excelファイルのアップロード
             upload_file_to_github(excel_file_name, repo_name, f"{excel_file_name}", commit_message)
 
-            # ダウンロードボタンの表示
+            st.markdown("---")  # 区切り線を追加
+
+            # ダウンロードボタンをおしゃれに表示
+            st.markdown(
+                f"""
+                <style>
+                .download-button {{
+                    background-color: #2ECC71;
+                    color: white;
+                    padding: 10px;
+                    font-size: 16px;
+                    border-radius: 5px;
+                    text-align: center;
+                    cursor: pointer;
+                }}
+                </style>
+                """, unsafe_allow_html=True
+            )
+
             with open(excel_file_name, "rb") as f:
                 st.download_button(
                     label="生成されたExcelファイルをダウンロード",
@@ -328,4 +371,3 @@ if st.sidebar.button("処理開始"):
             st.error(f"エラーが発生しました: {e}")
     else:
         st.warning("HTMLファイルをアップロードするか、HTMLを貼り付けてください。")
-
