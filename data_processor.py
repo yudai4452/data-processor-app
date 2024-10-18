@@ -1,3 +1,4 @@
+# 必要なモジュールのインポート
 import os
 import pandas as pd
 import openpyxl
@@ -5,6 +6,35 @@ from openpyxl.styles import PatternFill, Font
 from bs4 import BeautifulSoup
 import streamlit as st
 from datetime import datetime
+from github import Github
+
+# シークレットからGitHubトークンを取得
+GITHUB_TOKEN = st.secrets["github"]["token"]
+
+# GitHubへのファイルアップロード関数
+def upload_file_to_github(file_path, repo_name, file_name_in_repo, commit_message):
+    # GitHubに認証
+    g = Github(GITHUB_TOKEN)
+    user = g.get_user()
+    repo = user.get_repo(repo_name)
+
+    # ファイルの読み込み
+    with open(file_path, 'rb') as file:
+        content = file.read()
+
+    # リポジトリ内のファイルパス
+    path = file_name_in_repo
+
+    try:
+        # 既存のファイルがあるか確認
+        contents = repo.get_contents(path)
+        # ファイルを更新
+        repo.update_file(path, commit_message, content, contents.sha)
+        st.info(f"{file_name_in_repo} を更新しました。")
+    except Exception as e:
+        # ファイルが存在しない場合は新規作成
+        repo.create_file(path, commit_message, content)
+        st.info(f"{file_name_in_repo} を作成しました。")
 
 def extract_data_and_save_to_csv(html_path, output_csv_path, date):
     # HTMLファイルの内容を読み込み
@@ -161,7 +191,7 @@ output_csv_dir = st.sidebar.text_input("CSVファイルの保存フォルダ名"
 excel_file_name = st.sidebar.text_input("Excelファイル名", "マイジャグラーV_塗りつぶし済み.xlsx")
 date_input = st.sidebar.date_input("日付を選択", datetime.today())
 
-# 処理開始ボタン
+# 処理開始ボタンがクリックされたときの動作
 if st.sidebar.button("処理開始"):
     if uploaded_html is not None:
         # アップロードされたファイルを保存
@@ -181,7 +211,20 @@ if st.sidebar.button("処理開始"):
             process_juggler_data(html_path, output_csv_dir, excel_file_name, date_str)
             st.success(f"データ処理が完了し、{excel_file_name} に保存されました。")
 
-            # 生成されたExcelファイルをダウンロードリンクとして提供
+            # GitHubにファイルをアップロード
+            repo_name = "your-username/your-repo-name"  # リポジトリ名を指定
+            commit_message = f"Add data for {date_str}"
+
+            # CSVファイルのパス
+            output_csv_path = os.path.join(output_csv_dir, f"slot_machine_data_{date_str}.csv")
+
+            # CSVファイルのアップロード
+            upload_file_to_github(output_csv_path, repo_name, f"data/csv/slot_machine_data_{date_str}.csv", commit_message)
+
+            # Excelファイルのアップロード
+            upload_file_to_github(excel_file_name, repo_name, f"data/excel/{excel_file_name}", commit_message)
+
+            # ダウンロードボタンの表示
             with open(excel_file_name, "rb") as f:
                 st.download_button(
                     label="生成されたExcelファイルをダウンロード",
@@ -190,8 +233,6 @@ if st.sidebar.button("処理開始"):
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 )
 
-            # 生成されたCSVファイルをダウンロードリンクとして提供
-            output_csv_path = os.path.join(output_csv_dir, f"slot_machine_data_{date_str}.csv")
             if os.path.exists(output_csv_path):
                 with open(output_csv_path, "rb") as f:
                     st.download_button(
@@ -207,5 +248,4 @@ if st.sidebar.button("処理開始"):
             st.error(f"エラーが発生しました: {e}")
     else:
         st.warning("HTMLファイルをアップロードしてください。")
-
 
