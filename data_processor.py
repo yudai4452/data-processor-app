@@ -16,8 +16,8 @@ def upload_file_to_github(file_path, repo_name, file_name_in_repo, commit_messag
     try:
         # GitHubに認証
         g = Github(GITHUB_TOKEN)
-        user = g.get_user()
-        repo = user.get_repo(repo_name)
+        # リポジトリを取得
+        repo = g.get_repo(repo_name)
 
         # ファイルの読み込み
         with open(file_path, 'rb') as file:
