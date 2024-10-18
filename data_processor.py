@@ -190,18 +190,32 @@ st.write("HTMLファイルからデータを抽出し、Excelファイルを生�
 
 # サイドバーでユーザー入力を受け取る
 st.sidebar.header("入力パラメータ")
-uploaded_html = st.sidebar.file_uploader("HTMLファイルをアップロード", type=["html", "htm", "txt"])
+input_option = st.sidebar.radio("HTMLの入力方法を選択", ('ファイルをアップロード', 'HTMLを貼り付け'))
+
+if input_option == 'ファイルをアップロード':
+    uploaded_html = st.sidebar.file_uploader("HTMLファイルをアップロード", type=["html", "htm", "txt"])
+    html_content = None
+else:
+    html_content = st.sidebar.text_area("HTMLを貼り付け", height=300)
+    uploaded_html = None
+
 output_csv_dir = st.sidebar.text_input("CSVファイルの保存フォルダ名", "マイジャグラーV")
 excel_file_name = st.sidebar.text_input("Excelファイル名", "マイジャグラーV_塗りつぶし済み.xlsx")
 date_input = st.sidebar.date_input("日付を選択", datetime.today())
 
 # 処理開始ボタンがクリックされたときの動作
 if st.sidebar.button("処理開始"):
-    if uploaded_html is not None:
+    if uploaded_html is not None or html_content:
         # アップロードされたファイルを保存
-        html_path = os.path.join(".", uploaded_html.name)
-        with open(html_path, "wb") as f:
-            f.write(uploaded_html.getbuffer())
+        if uploaded_html is not None:
+            html_path = os.path.join(".", uploaded_html.name)
+            with open(html_path, "wb") as f:
+                f.write(uploaded_html.getbuffer())
+        else:
+            # ユーザーが貼り付けたHTMLをファイルとして保存
+            html_path = os.path.join(".", "uploaded_html.html")
+            with open(html_path, "w", encoding="utf-8") as f:
+                f.write(html_content)
 
         # 出力ディレクトリを作成
         if not os.path.exists(output_csv_dir):
@@ -251,4 +265,5 @@ if st.sidebar.button("処理開始"):
         except Exception as e:
             st.error(f"エラーが発生しました: {e}")
     else:
-        st.warning("HTMLファイルをアップロードしてください。")
+        st.warning("HTMLファイルをアップロードするか、HTMLを貼り付けてください。")
+
