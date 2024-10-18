@@ -8,8 +8,6 @@ import streamlit as st
 from datetime import datetime
 from github import Github
 
-# シークレットからGitHubトークンを取得
-GITHUB_TOKEN = st.secrets["github"]["token"]
 
 # GitHubへのファイルアップロード関数
 def upload_file_to_github(file_path, repo_name, file_name_in_repo, commit_message):
@@ -183,10 +181,74 @@ def process_juggler_data(html_path, output_csv_dir, excel_path, date):
 
     print(f"データ処理が完了し、{excel_path} に保存されました")
 
+# シークレットからGitHubトークンを取得
+GITHUB_TOKEN = st.secrets["github"]["token"]
 
 # ヘッダー
-st.title("データ処理アプリケーション")
-st.write("HTMLファイルからデータを抽出し、Excelファイルを生成します。")
+st.markdown(
+    """
+    <style>
+    .main-title {
+        font-size: 40px;
+        font-weight: bold;
+        color: #2C3E50;
+        text-align: center;
+    }
+    .subtitle {
+        font-size: 18px;
+        color: #34495E;
+        text-align: center;
+    }
+    .section-title {
+        font-size: 24px;
+        font-weight: bold;
+        color: #2980B9;
+        margin-top: 20px;
+    }
+    .instruction {
+        font-size: 16px;
+        color: #2C3E50;
+    }
+    </style>
+    <div class="main-title">🎰 データ処理アプリケーション 🎰</div>
+    <div class="subtitle">HTMLファイルからデータを抽出し、Excelファイルを生成します。</div>
+    """, unsafe_allow_html=True
+)
+
+# 台データオンラインのリンク
+st.markdown(
+    """
+    <div class="section-title">📊 メッセ武蔵境店 台データオンライン</div>
+    <div class="instruction">
+        台データはこちらのリンクからご確認ください： 
+        <a href="https://daidata.goraggio.com/100686" target="_blank">メッセ武蔵境店 - 台データオンライン</a>
+    </div>
+    """, unsafe_allow_html=True
+)
+
+# HTML取得方法の説明
+st.markdown(
+    """
+    <div class="section-title">🔍 HTMLの取得方法</div>
+    <div class="instruction">
+        1. リンク先のページにアクセス<br>
+        2. 右上にあるメニューを押し、「その他」を選択<br>
+        3. 「デベロッパーツール」を選択<br>
+        4. 画面左上の1行目に表示される「<html>」を右クリック<br>
+        5. 「copy」を選択し、「copy element」をクリック<br>
+    </div>
+    """, unsafe_allow_html=True
+)
+
+# HTML貼り付け時の注意点の説明
+st.markdown(
+    """
+    <div class="section-title">📋 HTMLを貼り付ける方法</div>
+    <div class="instruction">
+        HTMLを以下のフォームに貼り付けたら、<strong>Ctrl + Enter</strong>を押して処理を開始してください。
+    </div>
+    """, unsafe_allow_html=True
+)
 
 # サイドバーでユーザー入力を受け取る
 st.sidebar.header("入力パラメータ")
