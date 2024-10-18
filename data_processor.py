@@ -2,6 +2,7 @@
 import os
 import pandas as pd
 import openpyxl
+import pytz
 from openpyxl.styles import PatternFill, Font
 from bs4 import BeautifulSoup
 import streamlit as st
@@ -250,11 +251,9 @@ st.markdown(
     """, unsafe_allow_html=True
 )
 
-# 日本時間のタイムゾーンを作成
-JST = timezone(timedelta(hours=+9))
-
-# 現在の日本時間の日付を取得
-japan_today = datetime.now(JST)
+# 日本時間の今日の日付を取得
+japan_time_zone = pytz.timezone('Asia/Tokyo')
+current_date_japan = datetime.now(japan_time_zone)
 
 # サイドバーでユーザー入力を受け取る
 st.sidebar.markdown(
@@ -301,38 +300,44 @@ else:
     html_content = st.sidebar.text_area("HTMLを貼り付け", height=300)
     uploaded_html = None
 
+# "CSVファイルの保存フォルダ名"を固定（ユーザーが変更できないようにする）
+st.sidebar.text_input("CSVファイルの保存フォルダ名", "マイジャグラーV", disabled=True)
+
+# Excelファイル名の入力欄
+excel_file_name = st.sidebar.text_input("Excelファイル名", "マイジャグラーV_塗りつぶし済み.xlsx")
+
 # 日本時間の今日の日付をデフォルトに設定
-date_input = st.sidebar.date_input("日付を選択 (デフォルトは日本時間)", japan_today.date())
+date_input = st.sidebar.date_input("日付を選択", current_date_japan)
 
-# 処理開始ボタンのスタイル
+# 処理開始ボタンがクリックされたときの動作
 if st.sidebar.button("処理開始"):
-    if uploaded_html is not None or html_content:
-        if uploaded_html is not None:
-            html_path = os.path.join(".", uploaded_html.name)
-            with open(html_path, "wb") as f:
-                f.write(uploaded_html.getbuffer())
-        else:
-            html_path = os.path.join(".", "uploaded_html.html")
-            with open(html_path, "w", encoding="utf-8") as f:
-                f.write(html_content)
+    # 日付確認のポップアップを表示
+    confirm_date = st.sidebar.checkbox(f"選択した日付は {date_input} です。確認しましたか？")
+    
+    if confirm_date:
+        if uploaded_html is not None or html_content:
+            if uploaded_html is not None:
+                html_path = os.path.join(".", uploaded_html.name)
+                with open(html_path, "wb") as f:
+                    f.write(uploaded_html.getbuffer())
+            else:
+                html_path = os.path.join(".", "uploaded_html.html")
+                with open(html_path, "w", encoding="utf-8") as f:
+                    f.write(html_content)
 
-        if not os.path.exists(output_csv_dir):
-            os.makedirs(output_csv_dir)
+            if not os.path.exists("マイジャグラーV"):
+                os.makedirs("マイジャグラーV")
 
-        date_str = date_input.strftime("%Y-%m-%d")
+            date_str = date_input.strftime("%Y-%m-%d")
 
-        # 日付がデフォルトのままかチェックし、ユーザーが変更しなかった場合は警告
-        if date_input == japan_today.date():
-            st.warning("日付がデフォルトのままです。処理開始前に日付を確認してください。")
-        else:
             try:
-                process_juggler_data(html_path, output_csv_dir, excel_file_name, date_str)
+                process_juggler_data(html_path, "マイジャグラーV", excel_file_name, date_str)
                 st.success(f"データ処理が完了し、{excel_file_name} に保存されました。")
 
                 repo_name = "yudai4452/data-processor-app"
                 commit_message = f"Add data for {date_str}"
 
-                output_csv_path = os.path.join(output_csv_dir, f"slot_machine_data_{date_str}.csv")
+                output_csv_path = os.path.join("マイジャグラーV", f"slot_machine_data_{date_str}.csv")
 
                 upload_file_to_github(output_csv_path, repo_name, f"マイジャグラーV/slot_machine_data_{date_str}.csv", commit_message)
                 upload_file_to_github(excel_file_name, repo_name, f"{excel_file_name}", commit_message)
@@ -377,5 +382,7 @@ if st.sidebar.button("処理開始"):
 
             except Exception as e:
                 st.error(f"エラーが発生しました: {e}")
+        else:
+            st.warning("HTMLファイルをアップロードするか、HTMLを貼り付けてください。")
     else:
-        st.warning("HTMLファイルをアップロードするか、HTMLを貼り付けてください。")
+        st.warning("日付の確認を行ってください。")
