@@ -180,14 +180,29 @@ if st.sidebar.button("処理開始"):
         try:
             process_juggler_data(html_path, output_csv_dir, excel_file_name, date_str)
             st.success(f"データ処理が完了し、{excel_file_name} に保存されました。")
+
             # 生成されたExcelファイルをダウンロードリンクとして提供
             with open(excel_file_name, "rb") as f:
-                btn = st.download_button(
+                st.download_button(
                     label="生成されたExcelファイルをダウンロード",
                     data=f,
                     file_name=excel_file_name,
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 )
+
+            # 生成されたCSVファイルをダウンロードリンクとして提供
+            output_csv_path = os.path.join(output_csv_dir, f"slot_machine_data_{date_str}.csv")
+            if os.path.exists(output_csv_path):
+                with open(output_csv_path, "rb") as f:
+                    st.download_button(
+                        label="生成されたCSVファイルをダウンロード",
+                        data=f,
+                        file_name=os.path.basename(output_csv_path),
+                        mime="text/csv"
+                    )
+            else:
+                st.warning("CSVファイルが見つかりませんでした。")
+
         except Exception as e:
             st.error(f"エラーが発生しました: {e}")
     else:
