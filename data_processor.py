@@ -185,6 +185,10 @@ def process_juggler_data(html_path, output_csv_dir, excel_path, date):
 # シークレットからGitHubトークンを取得
 GITHUB_TOKEN = st.secrets["github"]["token"]
 
+# 日本時間の今日の日付を取得
+japan_time_zone = pytz.timezone('Asia/Tokyo')
+current_date_japan = datetime.now(japan_time_zone)
+
 # ヘッダー
 st.markdown(
     """
