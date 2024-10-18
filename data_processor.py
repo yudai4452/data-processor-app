@@ -8,7 +8,8 @@ import streamlit as st
 from datetime import datetime
 from github import Github
 
-
+# シークレットからGitHubトークンを取得
+GITHUB_TOKEN = st.secrets["github"]["token"]
 
 # GitHubへのファイルアップロード関数
 def upload_file_to_github(file_path, repo_name, file_name_in_repo, commit_message):
@@ -179,9 +180,6 @@ def process_juggler_data(html_path, output_csv_dir, excel_path, date):
     print(f"データ処理が完了し、{excel_path} に保存されました")
 
 
-# シークレットからGitHubトークンを取得
-GITHUB_TOKEN = st.secrets["github"]["token"]
-
 # ヘッダー
 st.title("データ処理アプリケーション")
 st.write("HTMLファイルからデータを抽出し、Excelファイルを生成します。")
@@ -214,17 +212,17 @@ if st.sidebar.button("処理開始"):
             st.success(f"データ処理が完了し、{excel_file_name} に保存されました。")
 
             # GitHubにファイルをアップロード
-            repo_name = "yudai4452/data-processor-app"  # リポジトリ名を指定
+            repo_name = "your-username/your-repo-name"  # リポジトリ名を指定
             commit_message = f"Add data for {date_str}"
 
             # CSVファイルのパス
             output_csv_path = os.path.join(output_csv_dir, f"slot_machine_data_{date_str}.csv")
 
             # CSVファイルのアップロード
-            upload_file_to_github(output_csv_path, repo_name, f"data-processor-app/マイジャグラーV/slot_machine_data_{date_str}.csv", commit_message)
+            upload_file_to_github(output_csv_path, repo_name, f"data/csv/slot_machine_data_{date_str}.csv", commit_message)
 
             # Excelファイルのアップロード
-            upload_file_to_github(excel_file_name, repo_name, f"data-processor-app/{excel_file_name}", commit_message)
+            upload_file_to_github(excel_file_name, repo_name, f"data/excel/{excel_file_name}", commit_message)
 
             # ダウンロードボタンの表示
             with open(excel_file_name, "rb") as f:
@@ -250,4 +248,3 @@ if st.sidebar.button("処理開始"):
             st.error(f"エラーが発生しました: {e}")
     else:
         st.warning("HTMLファイルをアップロードしてください。")
-
