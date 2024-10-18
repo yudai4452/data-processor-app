@@ -296,7 +296,7 @@ if input_option == 'ファイルをアップロード':
     uploaded_html = st.sidebar.file_uploader("HTMLファイルをアップロード", type=["html", "htm", "txt"])
     html_content = None
 else:
-    st.sidebar.markdown('<div class="sidebar-section">HTMLを貼り付けてください。貼り付け後に Ctrl + Enter を押してください。</div>', unsafe_allow_html=True)
+    st.sidebar.markdown('<div class="sidebar-section">HTMLを貼り付けてください。/n貼り付け後に Ctrl + Enter を押してください。</div>', unsafe_allow_html=True)
     html_content = st.sidebar.text_area("HTMLを貼り付け", height=300)
     uploaded_html = None
 
