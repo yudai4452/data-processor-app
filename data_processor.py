@@ -13,28 +13,32 @@ GITHUB_TOKEN = st.secrets["github"]["token"]
 
 # GitHubへのファイルアップロード関数
 def upload_file_to_github(file_path, repo_name, file_name_in_repo, commit_message):
-    # GitHubに認証
-    g = Github(GITHUB_TOKEN)
-    user = g.get_user()
-    repo = user.get_repo(repo_name)
-
-    # ファイルの読み込み
-    with open(file_path, 'rb') as file:
-        content = file.read()
-
-    # リポジトリ内のファイルパス
-    path = file_name_in_repo
-
     try:
-        # 既存のファイルがあるか確認
-        contents = repo.get_contents(path)
-        # ファイルを更新
-        repo.update_file(path, commit_message, content, contents.sha)
-        st.info(f"{file_name_in_repo} を更新しました。")
-    except Exception as e:
-        # ファイルが存在しない場合は新規作成
-        repo.create_file(path, commit_message, content)
-        st.info(f"{file_name_in_repo} を作成しました。")
+        # GitHubに認証
+        g = Github(GITHUB_TOKEN)
+        user = g.get_user()
+        repo = user.get_repo(repo_name)
+
+        # ファイルの読み込み
+        with open(file_path, 'rb') as file:
+            content = file.read()
+
+        # リポジトリ内のファイルパス
+        path = file_name_in_repo
+
+        try:
+            # 既存のファイルがあるか確認
+            contents = repo.get_contents(path)
+            # ファイルを更新
+            repo.update_file(path, commit_message, content, contents.sha)
+            st.info(f"{file_name_in_repo} を更新しました。")
+        except Exception as e_inner:
+            # ファイルが存在しない場合は新規作成
+            repo.create_file(path, commit_message, content)
+            st.info(f"{file_name_in_repo} を作成しました。")
+    except Exception as e_outer:
+        st.error(f"GitHubへのファイルアップロード中にエラーが発生しました: {e_outer}")
+        st.error(f"詳細: {e_outer.args}")
 
 def extract_data_and_save_to_csv(html_path, output_csv_path, date):
     # HTMLファイルの内容を読み込み
