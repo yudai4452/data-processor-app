@@ -301,7 +301,7 @@ else:
     html_content = st.sidebar.text_area("HTMLを貼り付け", height=300)
     uploaded_html = None
 
-# 日本時間の今日の日付をデフォルトに設定し、日付をユーザーが触らないようにする
+# 日本時間の今日の日付をデフォルトに設定
 date_input = st.sidebar.date_input("日付を選択 (デフォルトは日本時間)", japan_today.date())
 
 # 処理開始ボタンのスタイル
