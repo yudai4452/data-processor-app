@@ -8,8 +8,7 @@ import streamlit as st
 from datetime import datetime
 from github import Github
 
-# シークレットからGitHubトークンを取得
-GITHUB_TOKEN = st.secrets["github"]["token"]
+
 
 # GitHubへのファイルアップロード関数
 def upload_file_to_github(file_path, repo_name, file_name_in_repo, commit_message):
@@ -179,6 +178,9 @@ def process_juggler_data(html_path, output_csv_dir, excel_path, date):
 
     print(f"データ処理が完了し、{excel_path} に保存されました")
 
+
+# シークレットからGitHubトークンを取得
+GITHUB_TOKEN = st.secrets["github"]["token"]
 
 # ヘッダー
 st.title("データ処理アプリケーション")
