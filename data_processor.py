@@ -283,8 +283,8 @@ st.sidebar.markdown(
 st.sidebar.markdown('<div class="sidebar-title">📋 入力パラメータ</div>', unsafe_allow_html=True)
 st.sidebar.markdown('<div class="sidebar-section">HTMLファイルの入力方法を選択してください</div>', unsafe_allow_html=True)
 
-# ファイルのアップロードまたはHTMLの貼り付けオプションを提供
-input_option = st.sidebar.radio("HTMLの入力方法を選択", ('ファイルをアップロード', 'HTMLを貼り付け'))
+# デフォルトで"HTMLを貼り付け"が選択されるように設定
+input_option = st.sidebar.radio("HTMLの入力方法を選択", ('ファイルをアップロード', 'HTMLを貼り付け'), index=1)
 
 if input_option == 'ファイルをアップロード':
     st.sidebar.markdown('<div class="sidebar-section">HTMLファイルをアップロードしてください。</div>', unsafe_allow_html=True)
