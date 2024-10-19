@@ -299,31 +299,23 @@ st.sidebar.markdown('<div class="sidebar-section">HTMLファイルの入力方�
 # デフォルトで"HTMLを貼り付け"が選択されるように設定
 input_option = st.sidebar.radio("HTMLの入力方法を選択", ('ファイルをアップロード', 'HTMLを貼り付け'), index=1)
 
-uploaded_html = None
-
-# "uploaded_html" の存在チェックを行い、未定義の場合に None を代入
-uploaded_html = None
-
-# サイドバーUIでのHTML入力の選択肢
 if input_option == 'ファイルをアップロード':
     st.sidebar.markdown('<div class="sidebar-section">HTMLファイルをアップロードしてください。</div>', unsafe_allow_html=True)
     uploaded_html = st.sidebar.file_uploader("HTMLファイルをアップロード", type=["html", "htm", "txt"])
+    html_content = None
 else:
-    st.sidebar.markdown('<div class="sidebar-section">HTMLを貼り付けてください。<br>貼り付け後に Ctrl + Enter <br>を押してください。</div>', unsafe_allow_html=True)
+    st.sidebar.markdown('<div class="sidebar-section">HTMLを貼り付けてください。貼り付け後に Ctrl + Enter を押してください。</div>', unsafe_allow_html=True)
     html_content = st.sidebar.text_area("HTMLを貼り付け", height=300)
+    uploaded_html = None
 
-
-# "CSVファイルの保存フォルダ名"のUI改善
+# "CSVファイルの保存フォルダ名"を固定（ユーザーが変更できないようにする）
 st.sidebar.text_input("CSVファイルの保存フォルダ名", "マイジャグラーV", disabled=True)
 
-# Excelファイル名の入力欄の改善
+# Excelファイル名の入力欄
 excel_file_name = st.sidebar.text_input("Excelファイル名", "マイジャグラーV_塗りつぶし済み.xlsx")
 
 # 日本時間の今日の日付をデフォルトに設定
 date_input = st.sidebar.date_input("日付を選択", current_date_japan)
-
-# 日付確認のチェックボックスを追加
-confirm_date = st.sidebar.checkbox(f"選択した日付は {date_input} です。確認しましたか？")
 
 # 処理開始ボタンがクリックされたときの動作
 if st.sidebar.button("処理開始"):
