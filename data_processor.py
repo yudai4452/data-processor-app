@@ -182,19 +182,7 @@ def process_juggler_data(html_path, output_csv_dir, excel_path, date):
     # Step 3: 色を塗り分け
     apply_color_fill_to_excel(excel_path)
 
-    # ファイルをストリームにしてダウンロードボタンを作成するために読み込む
-    with open(excel_path, "rb") as file:
-        excel_data = file.read()
-
-    st.success(f"データ処理が完了し、{excel_path} に保存されました")
-    
-    # ダウンロードボタンを作成
-    st.download_button(
-        label="📥 Excelファイルをダウンロード",
-        data=excel_data,
-        file_name=os.path.basename(excel_path),
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
+    print(f"データ処理が完了し、{excel_path} に保存されました")
 
 # シークレットからGitHubトークンを取得
 GITHUB_TOKEN = st.secrets["github"]["token"]
