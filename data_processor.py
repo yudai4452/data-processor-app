@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 import streamlit as st
 from datetime import datetime, timedelta, timezone
 from github import Github
+import plotly.graph_objects as go 
 
 # ダウンロード用にファイルを読み込む関数
 def download_excel_file(excel_path):
@@ -82,6 +83,39 @@ def extract_data_and_save_to_csv(html_path, output_csv_path, date):
     # CSVファイルとして保存
     df.to_csv(output_csv_path, index=False, encoding="shift-jis")
     return df
+
+# Excelファイルの読み込み関数（追加）
+def load_excel_data(excel_path):
+    # Excelファイルを読み込み
+    df = pd.read_excel(excel_path, sheet_name="合成確率", engine="openpyxl", index_col=0)
+    return df
+
+# 台番号ごとの合成確率の推移をプロットする関数（追加）
+def plot_synthetic_probabilities(df, selected_machine_number):
+    # 選択された台番号の合成確率データを取得
+    machine_data = df.loc[selected_machine_number].dropna()
+
+    # プロットするためのデータ
+    dates = machine_data.index
+    probabilities = machine_data.values
+
+    # Plotlyを使用してグラフを作成
+    fig = go.Figure()
+
+    # 合成確率の推移をプロット
+    fig.add_trace(go.Scatter(x=dates, y=probabilities, mode='lines+markers', name=f'合成確率: {selected_machine_number}'))
+
+    # グラフのタイトルとラベルを設定
+    fig.update_layout(
+        title=f"台番号 {selected_machine_number} の合成確率の推移",
+        xaxis_title="日付",
+        yaxis_title="合成確率",
+        xaxis=dict(tickformat="%Y-%m-%d"),
+        hovermode="x"
+    )
+
+    # Streamlitでグラフを表示
+    st.plotly_chart(fig)
 
 def create_new_excel_with_all_data(output_csv_dir, excel_path):
     # フォルダー内のすべてのCSVファイルを取得
@@ -185,6 +219,8 @@ def process_juggler_data(html_path, output_csv_dir, excel_path, date):
     apply_color_fill_to_excel(excel_path)
 
     print(f"データ処理が完了し、{excel_path} に保存されました")
+
+
 
 # シークレットからGitHubトークンを取得
 GITHUB_TOKEN = st.secrets["github"]["token"]
@@ -387,6 +423,23 @@ if st.sidebar.button("処理開始"):
                         )
                 else:
                     st.warning("CSVファイルが見つかりませんでした。")
+                    
+                 # 台番号選択と合成確率のプロット
+                if os.path.exists(excel_file_name):
+                    st.sidebar.markdown('<div class="sidebar-section">台番号を選択してください</div>', unsafe_allow_html=True)
+
+                    # Excelファイルの読み込み
+                    df_synthetic = load_excel_data(excel_file_name)
+
+                    # 台番号のリストを取得
+                    machine_numbers = df_synthetic.index.tolist()
+
+                    # 台番号を選択するためのドロップダウンメニューをサイドバーに表示
+                    selected_machine_number = st.sidebar.selectbox("台番号を選択", machine_numbers)
+
+                    # 合成確率の推移をプロット
+                    if selected_machine_number:
+                        plot_synthetic_probabilities(df_synthetic, selected_machine_number)
 
             except Exception as e:
                 st.error(f"エラーが発生しました: {e}")
