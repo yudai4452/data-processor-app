@@ -194,7 +194,7 @@ st.markdown(
     """
     <style>
     .main-title {
-        font-size: 45px;
+        font-size: 40px;
         font-weight: bold;
         color: #34495E;  /* 濃いグレー */
         text-align: center;
@@ -219,7 +219,7 @@ st.markdown(
         margin-bottom: 20px;  /* 説明テキストの下に余白を追加 */
     }
     </style>
-    <div class="main-title">🎰データ処理アプリケーション🎰</div>
+    <div class="main-title">🎰 データ処理アプリケーション 🎰</div>
     <div class="subtitle">HTMLファイルからデータを抽出し、Excelファイルを生成します。</div>
     """, unsafe_allow_html=True
 )
