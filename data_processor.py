@@ -295,6 +295,9 @@ st.sidebar.markdown('<div class="sidebar-section">HTMLファイルの入力方�
 # デフォルトで"HTMLを貼り付け"が選択されるように設定
 input_option = st.sidebar.radio("HTMLの入力方法を選択", ('ファイルをアップロード', 'HTMLを貼り付け'), index=1)
 
+uploaded_html = None
+
+# サイドバーUIでのHTML入力の選択肢
 if input_option == 'ファイルをアップロード':
     st.sidebar.markdown('<div class="sidebar-section">HTMLファイルをアップロードしてください。</div>', unsafe_allow_html=True)
     uploaded_html = st.sidebar.file_uploader("HTMLファイルをアップロード", type=["html", "htm", "txt"])
