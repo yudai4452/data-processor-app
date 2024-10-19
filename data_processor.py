@@ -3,14 +3,16 @@ import os
 import pandas as pd
 import openpyxl
 import pytz
-
 from openpyxl.styles import PatternFill, Font
 from bs4 import BeautifulSoup
 import streamlit as st
 from datetime import datetime, timedelta, timezone
 from github import Github
 
-
+# ダウンロード用にファイルを読み込む関数
+def download_excel_file(excel_path):
+    with open(excel_path, "rb") as f:
+        return f.read()
 
 # GitHubへのファイルアップロード関数
 def upload_file_to_github(file_path, repo_name, file_name_in_repo, commit_message):
@@ -327,8 +329,19 @@ confirm_date = st.sidebar.checkbox(f"選択した日付は {date_input} です�
 if st.sidebar.button("処理開始"):
     if confirm_date:
         if uploaded_html is not None or html_content:
-            # 処理の詳細をここに記述...
+            # データ処理の詳細をここに記述...
             st.success(f"データ処理が完了し、{excel_file_name} に保存されました。")
+
+            # ダウンロード用のExcelファイルを読み込む
+            excel_data = download_excel_file(excel_file_name)
+
+            # ダウンロードボタンの表示
+            st.download_button(
+                label="マイジャグラーV_塗りつぶし済み.xlsx をダウンロード",
+                data=excel_data,
+                file_name=excel_file_name,
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
         else:
             st.warning("HTMLファイルをアップロードするか、HTMLを貼り付けてください。")
     else:
