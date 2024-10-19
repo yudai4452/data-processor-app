@@ -299,6 +299,9 @@ input_option = st.sidebar.radio("HTMLの入力方法を選択", ('ファイル�
 
 uploaded_html = None
 
+# "uploaded_html" の存在チェックを行い、未定義の場合に None を代入
+uploaded_html = None
+
 # サイドバーUIでのHTML入力の選択肢
 if input_option == 'ファイルをアップロード':
     st.sidebar.markdown('<div class="sidebar-section">HTMLファイルをアップロードしてください。</div>', unsafe_allow_html=True)
@@ -306,6 +309,7 @@ if input_option == 'ファイルをアップロード':
 else:
     st.sidebar.markdown('<div class="sidebar-section">HTMLを貼り付けてください。<br>貼り付け後に Ctrl + Enter <br>を押してください。</div>', unsafe_allow_html=True)
     html_content = st.sidebar.text_area("HTMLを貼り付け", height=300)
+
 
 # "CSVファイルの保存フォルダ名"のUI改善
 st.sidebar.text_input("CSVファイルの保存フォルダ名", "マイジャグラーV", disabled=True)
