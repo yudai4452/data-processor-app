@@ -317,11 +317,11 @@ excel_file_name = st.sidebar.text_input("Excelファイル名", "マイジャグ
 # 日本時間の今日の日付をデフォルトに設定
 date_input = st.sidebar.date_input("日付を選択", current_date_japan)
 
+# 日付確認のポップアップを表示
+confirm_date = st.sidebar.checkbox(f"選択した日付は {date_input} です。確認しましたか？")
+
 # 処理開始ボタンがクリックされたときの動作
 if st.sidebar.button("処理開始"):
-    # 日付確認のポップアップを表示
-    confirm_date = st.sidebar.checkbox(f"選択した日付は {date_input} です。確認しましたか？")
-    
     if confirm_date:
         if uploaded_html is not None or html_content:
             if uploaded_html is not None:
