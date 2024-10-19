@@ -306,7 +306,7 @@ else:
 st.sidebar.text_input("CSVファイルの保存フォルダ名", "マイジャグラーV", disabled=True)
 
 # Excelファイル名の入力欄の改善
-st.sidebar.text_input("Excelファイル名", "マイジャグラーV_塗りつぶし済み.xlsx")
+excel_file_name = st.sidebar.text_input("Excelファイル名", "マイジャグラーV_塗りつぶし済み.xlsx")
 
 # 日本時間の今日の日付をデフォルトに設定
 date_input = st.sidebar.date_input("日付を選択", current_date_japan)
