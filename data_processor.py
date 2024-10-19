@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 import streamlit as st
 from datetime import datetime, timedelta, timezone
 from github import Github
+import tempfile
 
 
 # GitHubへのファイルアップロード関数
@@ -331,9 +332,22 @@ confirm_date = st.sidebar.checkbox(f"選択した日付は {date_input} です�
 # 処理開始ボタンのデザインと動作の改善
 if st.sidebar.button("処理開始"):
     if confirm_date:
-        if uploaded_html is not None or html_content:
-            # 選択されたHTMLからデータを処理し、Excelファイルを生成
-            process_juggler_data(html_path=uploaded_html, output_csv_dir="output", excel_path=excel_file_name, date=date_input)
+        if uploaded_html is not None:
+            # アップロードされたHTMLファイルを一時ファイルに保存
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".html") as tmp_file:
+                tmp_file.write(uploaded_html.read())
+                tmp_file_path = tmp_file.name
+            # 一時ファイルのパスを使用して処理を実行
+            process_juggler_data(html_path=tmp_file_path, output_csv_dir="output", excel_path=excel_file_name, date=date_input)
+
+        elif html_content:
+            # 貼り付けられたHTMLコンテンツを一時ファイルに保存
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".html") as tmp_file:
+                tmp_file.write(html_content.encode("utf-8"))
+                tmp_file_path = tmp_file.name
+            # 一時ファイルのパスを使用して処理を実行
+            process_juggler_data(html_path=tmp_file_path, output_csv_dir="output", excel_path=excel_file_name, date=date_input)
+        
         else:
             st.warning("HTMLファイルをアップロードするか、HTMLを貼り付けてください。")
     else:
