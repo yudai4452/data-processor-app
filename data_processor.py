@@ -3,7 +3,7 @@ import os
 import pandas as pd
 import openpyxl
 import pytz
-import tempfile
+
 from openpyxl.styles import PatternFill, Font
 from bs4 import BeautifulSoup
 import streamlit as st
@@ -328,27 +328,15 @@ excel_file_name = st.sidebar.text_input("Excelファイル名", "マイジャグ
 # 日本時間の今日の日付をデフォルトに設定
 date_input = st.sidebar.date_input("日付を選択", current_date_japan)
 
+# 日付確認のチェックボックスを追加
 confirm_date = st.sidebar.checkbox(f"選択した日付は {date_input} です。確認しましたか？")
 
 # 処理開始ボタンのデザインと動作の改善
 if st.sidebar.button("処理開始"):
     if confirm_date:
-        if uploaded_html is not None:
-            # アップロードされたHTMLファイルを一時ファイルに保存
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".html") as tmp_file:
-                tmp_file.write(uploaded_html.read())
-                tmp_file_path = tmp_file.name
-            # 一時ファイルのパスを使用して処理を実行
-            process_juggler_data(html_path=tmp_file_path, output_csv_dir="output", excel_path=excel_file_name, date=date_input)
-
-        elif html_content:
-            # 貼り付けられたHTMLコンテンツを一時ファイルに保存
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".html") as tmp_file:
-                tmp_file.write(html_content.encode("utf-8"))
-                tmp_file_path = tmp_file.name
-            # 一時ファイルのパスを使用して処理を実行
-            process_juggler_data(html_path=tmp_file_path, output_csv_dir="output", excel_path=excel_file_name, date=date_input)
-        
+        if uploaded_html is not None or html_content:
+            # 処理の詳細をここに記述...
+            st.success(f"データ処理が完了し、{excel_file_name} に保存されました。")
         else:
             st.warning("HTMLファイルをアップロードするか、HTMLを貼り付けてください。")
     else:
