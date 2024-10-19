@@ -332,8 +332,8 @@ confirm_date = st.sidebar.checkbox(f"選択した日付は {date_input} です�
 if st.sidebar.button("処理開始"):
     if confirm_date:
         if uploaded_html is not None or html_content:
-            # 処理の詳細をここに記述...
-            st.success(f"データ処理が完了し、{excel_file_name} に保存されました。")
+            # 選択されたHTMLからデータを処理し、Excelファイルを生成
+            process_juggler_data(html_path=uploaded_html, output_csv_dir="output", excel_path=excel_file_name, date=date_input)
         else:
             st.warning("HTMLファイルをアップロードするか、HTMLを貼り付けてください。")
     else:
