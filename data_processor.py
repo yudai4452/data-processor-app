@@ -254,7 +254,7 @@ st.markdown(
     """
     <div class="section-title">📋 HTMLを貼り付ける方法</div>
     <div class="instruction">
-        HTMLを以下のフォームに貼り付けたら、<strong>Ctrl + Enter</strong>を押して処理を開始してください。
+        HTMLを以下のフォームに貼り付けたら、<strong>Ctrl + Enter</strong>を押して処理を<br>開始してください。
     </div>
     """, unsafe_allow_html=True
 )
