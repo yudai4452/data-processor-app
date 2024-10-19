@@ -332,16 +332,20 @@ if st.sidebar.button("処理開始"):
             # データ処理の詳細をここに記述...
             st.success(f"データ処理が完了し、{excel_file_name} に保存されました。")
 
-            # ダウンロード用のExcelファイルを読み込む
-            excel_data = download_excel_file(excel_file_name)
+            # Excelファイルが実際に存在するか確認
+            if os.path.exists(excel_file_name):
+                # ダウンロード用のExcelファイルを読み込む
+                excel_data = download_excel_file(excel_file_name)
 
-            # ダウンロードボタンの表示
-            st.download_button(
-                label="マイジャグラーV_塗りつぶし済み.xlsx をダウンロード",
-                data=excel_data,
-                file_name=excel_file_name,
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            )
+                # ダウンロードボタンの表示
+                st.download_button(
+                    label="マイジャグラーV_塗りつぶし済み.xlsx をダウンロード",
+                    data=excel_data,
+                    file_name=excel_file_name,
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                )
+            else:
+                st.error(f"指定したファイルが見つかりません: {excel_file_name}")
         else:
             st.warning("HTMLファイルをアップロードするか、HTMLを貼り付けてください。")
     else:
