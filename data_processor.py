@@ -111,11 +111,12 @@ def plot_synthetic_probabilities(df, selected_machine_number):
         xaxis_title="日付",
         yaxis_title="合成確率",
         xaxis=dict(tickformat="%Y-%m-%d"),
-        hovermode="x"
+        hovermode="x",
+        height=600  # グラフの高さを固定
     )
 
     # Streamlitでグラフを表示
-    st.plotly_chart(fig)
+    st.plotly_chart(fig, use_container_width=True)
 
 def create_new_excel_with_all_data(output_csv_dir, excel_path):
     # フォルダー内のすべてのCSVファイルを取得
@@ -431,34 +432,4 @@ if st.sidebar.button("処理開始"):
                     with open(excel_file_name, "rb") as f:
                         st.download_button(
                             label="生成されたExcelファイルをダウンロード",
-                            data=f,
-                            file_name=excel_file_name,
-                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                            key="excel_download_button"
-                        )
-                else:
-                    st.warning("Excelファイルが見つかりませんでした。")
-
-                # 台番号選択と合成確率のプロット
-                if os.path.exists(excel_file_name):
-                    st.sidebar.markdown('<div class="sidebar-section">台番号を選択してください</div>', unsafe_allow_html=True)
-
-                    # Excelファイルの読み込み
-                    df_synthetic = load_excel_data(excel_file_name)
-
-                    # 台番号のリストを取得
-                    machine_numbers = df_synthetic.index.tolist()
-
-                    # 台番号を選択するためのドロップダウンメニューをサイドバーに表示
-                    selected_machine_number = st.sidebar.selectbox("台番号を選択", machine_numbers, key="new_excel_plot")
-
-                    # 合成確率の推移をプロット
-                    if selected_machine_number:
-                        plot_synthetic_probabilities(df_synthetic, selected_machine_number)
-
-            except Exception as e:
-                st.error(f"エラーが発生しました: {e}")
-        else:
-            st.warning("HTMLファイルをアップロードするか、HTMLを貼り付けてください。")
-    else:
-        st.warning("日付の確認を行ってください。")
+                           
