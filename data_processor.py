@@ -238,27 +238,27 @@ st.markdown(
     .main-title {
         font-size: 40px;
         font-weight: bold;
-        color: #34495E;  /* 濃いグレー */
+        color: #34495E;  
         text-align: center;
-        margin-bottom: 20px;  /* タイトルの下に余白を追加 */
+        margin-bottom: 20px;
     }
     .subtitle {
         font-size: 20px;
-        color: #2ECC71;  /* 明るいグリーン */
+        color: #2ECC71;  
         text-align: center;
-        margin-bottom: 30px;  /* サブタイトルの下に余白を追加 */
+        margin-bottom: 30px;
     }
     .section-title {
         font-size: 26px;
         font-weight: bold;
-        color: #2980B9;  /* ブルー */
+        color: #2980B9;  
         margin-top: 30px;
-        margin-bottom: 10px;  /* セクションタイトルの上下に余白を追加 */
+        margin-bottom: 10px;
     }
     .instruction {
-        font-size: 18px;  /* 文字サイズを少し大きく */
+        font-size: 18px;
         color: #2C3E50;
-        margin-bottom: 20px;  /* 説明テキストの下に余白を追加 */
+        margin-bottom: 20px;
     }
     </style>
     <div class="main-title">🎰 Juggler Data Manager 🎰</div>
@@ -291,46 +291,7 @@ st.markdown(
     """, unsafe_allow_html=True
 )
 
-# HTML貼り付け時の注意点の説明
-st.markdown(
-    """
-    <div class="section-title">📋 HTMLを貼り付ける方法</div>
-    <div class="instruction">
-        HTMLを以下のフォームに貼り付けたら、<strong>Ctrl + Enter</strong>を押して処理を<br>開始してください。
-    </div>
-    """, unsafe_allow_html=True
-)
-
-# サイドバーでユーザー入力を受け取る
-st.sidebar.markdown(
-    """
-    <style>
-    .sidebar-title {
-        font-size: 22px;
-        font-weight: bold;
-        color: #2980B9;
-        margin-bottom: 15px;  /* タイトルの下に余白を追加 */
-    }
-    .sidebar-section {
-        font-size: 18px;
-        color: #34495E;
-        margin-bottom: 10px;  /* 各セクションに余白を追加 */
-    }
-    .processing-button {
-        background-color: #3498DB;
-        color: white;
-        padding: 12px;
-        font-size: 18px;
-        border-radius: 5px;
-        text-align: center;
-        cursor: pointer;
-        margin-top: 20px;  /* ボタンの上に余白を追加 */
-    }
-    </style>
-    """, unsafe_allow_html=True
-)
-
-# サイドバーUIの修正
+# サイドバーUI
 st.sidebar.markdown('<div class="sidebar-title">📋 入力パラメータ</div>', unsafe_allow_html=True)
 st.sidebar.markdown('<div class="sidebar-section">HTMLファイルの入力方法を選択してください</div>', unsafe_allow_html=True)
 
@@ -346,7 +307,7 @@ else:
     html_content = st.sidebar.text_area("HTMLを貼り付け", height=300)
     uploaded_html = None
 
-# "CSVファイルの保存フォルダ名"を固定（ユーザーが変更できないようにする）
+# CSVファイルの保存フォルダ名の固定
 st.sidebar.text_input("CSVファイルの保存フォルダ名", "マイジャグラーV", disabled=True)
 
 # Excelファイル名の入力欄
@@ -388,9 +349,9 @@ if st.sidebar.button("処理開始"):
                 upload_file_to_github(output_csv_path, repo_name, f"マイジャグラーV/slot_machine_data_{date_str}.csv", commit_message)
                 upload_file_to_github(excel_file_name, repo_name, f"{excel_file_name}", commit_message)
 
-                st.markdown("---")  # 区切り線を追加
+                st.markdown("---")
 
-                # ダウンロードボタンをおしゃれに表示
+                # ダウンロードボタンのスタイルを設定
                 st.markdown(
                     f"""
                     <style>
@@ -407,7 +368,7 @@ if st.sidebar.button("処理開始"):
                     """, unsafe_allow_html=True
                 )
 
-                # CSVファイルのダウンロードボタン
+                # CSVファイルとExcelファイルのダウンロードボタンを常に表示
                 if os.path.exists(output_csv_path):
                     with open(output_csv_path, "rb") as f:
                         st.download_button(
@@ -418,7 +379,6 @@ if st.sidebar.button("処理開始"):
                             key="csv_download_button"
                         )
 
-                # Excelファイルのダウンロードボタン
                 if os.path.exists(excel_file_name):
                     with open(excel_file_name, "rb") as f:
                         st.download_button(
@@ -428,9 +388,9 @@ if st.sidebar.button("処理開始"):
                             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                             key="excel_download_button"
                         )
-                    
-                st.markdown("---")  # 区切り線を追加
-                 
+
+                st.markdown("---")
+
                 # 台番号選択と合成確率のプロット
                 if os.path.exists(excel_file_name):
                     st.sidebar.markdown('<div class="sidebar-section">台番号を選択してください</div>', unsafe_allow_html=True)
