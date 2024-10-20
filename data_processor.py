@@ -171,20 +171,22 @@ def process_juggler_data(html_path, output_csv_dir, excel_path, date):
 
 # CSVとExcelファイルを両方ダウンロード可能にする
 def display_download_buttons(output_csv_path, excel_path):
+    # CSVファイルのダウンロードボタンを表示
     if os.path.exists(output_csv_path):
         with open(output_csv_path, "rb") as f:
             st.download_button(
                 label="CSVファイルをダウンロード",
-                data=f,
+                data=f.read(),
                 file_name=os.path.basename(output_csv_path),
                 mime="text/csv",
                 key="csv_download_button"
             )
+    # Excelファイルのダウンロードボタンを表示
     if os.path.exists(excel_path):
         with open(excel_path, "rb") as f:
             st.download_button(
                 label="Excelファイルをダウンロード",
-                data=f,
+                data=f.read(),
                 file_name=excel_path,
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 key="excel_download_button"
