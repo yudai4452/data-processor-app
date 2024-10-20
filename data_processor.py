@@ -259,7 +259,7 @@ st.markdown(
         margin-bottom: 20px;  /* 説明テキストの下に余白を追加 */
     }
     </style>
-    <div class="main-title">🎰 Juggler Data Manager 🎰</div>
+    <div class="main-title">🎯 Juggler Data Manager 🎯</div>
     <div class="subtitle">HTMLファイルからデータを抽出し、Excelファイルを生成します。</div>
     """, unsafe_allow_html=True
 )
@@ -405,14 +405,7 @@ if st.sidebar.button("処理開始"):
                     """, unsafe_allow_html=True
                 )
 
-                with open(excel_file_name, "rb") as f:
-                    st.download_button(
-                        label="生成されたExcelファイルをダウンロード",
-                        data=f,
-                        file_name=excel_file_name,
-                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                    )
-
+                # CSVファイルダウンロードボタン
                 if os.path.exists(output_csv_path):
                     with open(output_csv_path, "rb") as f:
                         st.download_button(
@@ -423,8 +416,20 @@ if st.sidebar.button("処理開始"):
                         )
                 else:
                     st.warning("CSVファイルが見つかりませんでした。")
-                    
-                 # 台番号選択と合成確率のプロット
+
+                # Excelファイルダウンロードボタン
+                if os.path.exists(excel_file_name):
+                    with open(excel_file_name, "rb") as f:
+                        st.download_button(
+                            label="生成されたExcelファイルをダウンロード",
+                            data=f,
+                            file_name=excel_file_name,
+                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                        )
+                else:
+                    st.warning("Excelファイルが見つかりませんでした。")
+
+                # 台番号選択と合成確率のプロット
                 if os.path.exists(excel_file_name):
                     st.sidebar.markdown('<div class="sidebar-section">台番号を選択してください</div>', unsafe_allow_html=True)
 
