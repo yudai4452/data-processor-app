@@ -221,7 +221,6 @@ def process_juggler_data(html_path, output_csv_dir, excel_path, date):
     print(f"データ処理が完了し、{excel_path} に保存されました")
 
 
-
 # シークレットからGitHubトークンを取得
 GITHUB_TOKEN = st.secrets["github"]["token"]
 
@@ -356,6 +355,15 @@ date_input = st.sidebar.date_input("日付を選択", current_date_japan)
 # 日付確認のポップアップを表示
 confirm_date = st.sidebar.checkbox(f"選択した日付は {date_input} です。確認しましたか？")
 
+# 既存のExcelファイルをプロットするオプション
+if os.path.exists(excel_file_name):
+    st.sidebar.markdown('<div class="sidebar-section">既存のExcelファイルからプロット</div>', unsafe_allow_html=True)
+    df_synthetic = load_excel_data(excel_file_name)
+    machine_numbers = df_synthetic.index.tolist()
+    selected_machine_number = st.sidebar.selectbox("台番号を選択してプロットする", machine_numbers, key="existing_excel_plot")
+    if selected_machine_number:
+        plot_synthetic_probabilities(df_synthetic, selected_machine_number)
+
 # 処理開始ボタンがクリックされたときの動作
 if st.sidebar.button("処理開始"):
     if confirm_date:
@@ -442,7 +450,7 @@ if st.sidebar.button("処理開始"):
                     machine_numbers = df_synthetic.index.tolist()
 
                     # 台番号を選択するためのドロップダウンメニューをサイドバーに表示
-                    selected_machine_number = st.sidebar.selectbox("台番号を選択", machine_numbers)
+                    selected_machine_number = st.sidebar.selectbox("台番号を選択", machine_numbers, key="new_excel_plot")
 
                     # 合成確率の推移をプロット
                     if selected_machine_number:
