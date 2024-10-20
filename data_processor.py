@@ -117,6 +117,7 @@ def plot_synthetic_probabilities(df, selected_machine_number):
     # Streamlitでグラフを表示
     st.plotly_chart(fig)
 
+
 def create_new_excel_with_all_data(output_csv_dir, excel_path):
     # フォルダー内のすべてのCSVファイルを取得
     csv_files = [os.path.join(output_csv_dir, f) for f in os.listdir(output_csv_dir) if f.endswith('.csv')]
@@ -183,6 +184,7 @@ def create_new_excel_with_all_data(output_csv_dir, excel_path):
     # 新しいExcelファイルを保存
     wb.save(excel_path)
 
+
 def apply_color_fill_to_excel(excel_path):
     # Excelファイルを読み込み
     wb = openpyxl.load_workbook(excel_path)
@@ -207,6 +209,7 @@ def apply_color_fill_to_excel(excel_path):
     # 色を塗りつぶしたExcelファイルを保存
     wb.save(excel_path)
 
+
 def process_juggler_data(html_path, output_csv_dir, excel_path, date):
     # Step 1: データを抽出してCSVに保存
     output_csv_path = os.path.join(output_csv_dir, f"slot_machine_data_{date}.csv")
@@ -219,6 +222,7 @@ def process_juggler_data(html_path, output_csv_dir, excel_path, date):
     apply_color_fill_to_excel(excel_path)
 
     print(f"データ処理が完了し、{excel_path} に保存されました")
+
 
 # シークレットからGitHubトークンを取得
 GITHUB_TOKEN = st.secrets["github"]["token"]
@@ -413,8 +417,6 @@ if st.sidebar.button("処理開始"):
                             mime="text/csv",
                             key="csv_download_button"
                         )
-                else:
-                    st.warning("CSVファイルが見つかりませんでした。")
 
                 # Excelファイルのダウンロードボタン
                 if os.path.exists(excel_file_name):
@@ -426,8 +428,6 @@ if st.sidebar.button("処理開始"):
                             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                             key="excel_download_button"
                         )
-                else:
-                    st.warning("Excelファイルが見つかりませんでした。")
                     
                 st.markdown("---")  # 区切り線を追加
                  
