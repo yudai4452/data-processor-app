@@ -111,8 +111,7 @@ def plot_synthetic_probabilities(df, selected_machine_number):
         xaxis_title="日付",
         yaxis_title="合成確率",
         xaxis=dict(tickformat="%Y-%m-%d"),
-        hovermode="x",
-        height=600  # グラフの高さを固定
+        hovermode="x"
     )
 
     # Streamlitでグラフを表示
@@ -337,24 +336,24 @@ input_option = st.sidebar.radio("HTMLの入力方法を選択", ('ファイル�
 
 if input_option == 'ファイルをアップロード':
     st.sidebar.markdown('<div class="sidebar-section">HTMLファイルをアップロードしてください。</div>', unsafe_allow_html=True)
-    uploaded_html = st.sidebar.file_uploader("HTMLファイルをアップロード", type=["html", "htm", "txt"])
+    uploaded_html = st.sidebar.file_uploader("HTMLファイルをアップロード", type=["html", "htm", "txt"], key="file_uploader")
     html_content = None
 else:
     st.sidebar.markdown('<div class="sidebar-section">HTMLを貼り付けてください。貼り付け後に Ctrl + Enter を押してください。</div>', unsafe_allow_html=True)
-    html_content = st.sidebar.text_area("HTMLを貼り付け", height=300)
+    html_content = st.sidebar.text_area("HTMLを貼り付け", height=300, key="text_area")
     uploaded_html = None
 
 # "CSVファイルの保存フォルダ名"を固定（ユーザーが変更できないようにする）
-st.sidebar.text_input("CSVファイルの保存フォルダ名", "マイジャグラーV", disabled=True)
+st.sidebar.text_input("CSVファイルの保存フォルダ名", "マイジャグラーV", disabled=True, key="folder_name")
 
 # Excelファイル名の入力欄
-excel_file_name = st.sidebar.text_input("Excelファイル名", "マイジャグラーV_塗りつぶし済み.xlsx")
+excel_file_name = st.sidebar.text_input("Excelファイル名", "マイジャグラーV_塗りつぶし済み.xlsx", key="excel_file_name")
 
 # 日本時間の今日の日付をデフォルトに設定
-date_input = st.sidebar.date_input("日付を選択", current_date_japan)
+date_input = st.sidebar.date_input("日付を選択", current_date_japan, key="date_input")
 
 # 日付確認のポップアップを表示
-confirm_date = st.sidebar.checkbox(f"選択した日付は {date_input} です。確認しましたか？")
+confirm_date = st.sidebar.checkbox(f"選択した日付は {date_input} です。確認しましたか？", key="confirm_date")
 
 # 既存のExcelファイルをプロットするオプション
 if os.path.exists(excel_file_name):
@@ -432,4 +431,34 @@ if st.sidebar.button("処理開始"):
                     with open(excel_file_name, "rb") as f:
                         st.download_button(
                             label="生成されたExcelファイルをダウンロード",
-                           
+                            data=f,
+                            file_name=excel_file_name,
+                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                            key="excel_download_button"
+                        )
+                else:
+                    st.warning("Excelファイルが見つかりませんでした。")
+
+                # 台番号選択と合成確率のプロット
+                if os.path.exists(excel_file_name):
+                    st.sidebar.markdown('<div class="sidebar-section">台番号を選択してください</div>', unsafe_allow_html=True)
+
+                    # Excelファイルの読み込み
+                    df_synthetic = load_excel_data(excel_file_name)
+
+                    # 台番号のリストを取得
+                    machine_numbers = df_synthetic.index.tolist()
+
+                    # 台番号を選択するためのドロップダウンメニューをサイドバーに表示
+                    selected_machine_number = st.sidebar.selectbox("台番号を選択", machine_numbers, key="new_excel_plot")
+
+                    # 合成確率の推移をプロット
+                    if selected_machine_number:
+                        plot_synthetic_probabilities(df_synthetic, selected_machine_number)
+
+            except Exception as e:
+                st.error(f"エラーが発生しました: {e}")
+        else:
+            st.warning("HTMLファイルをアップロードするか、HTMLを貼り付けてください。")
+    else:
+        st.warning("日付の確認を行ってください。")
