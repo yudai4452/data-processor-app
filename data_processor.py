@@ -7,11 +7,11 @@ from bs4 import BeautifulSoup
 import streamlit as st
 from datetime import datetime
 from github import Github
-import plotly.graph_objects as go 
+import plotly.graph_objects as go
 
 # ダウンロード用にファイルを読み込む関数
-def download_excel_file(excel_path):
-    with open(excel_path, "rb") as f:
+def download_file(path):
+    with open(path, "rb") as f:
         return f.read()
 
 # GitHubへのファイルアップロード関数
@@ -19,22 +19,19 @@ def upload_file_to_github(file_path, repo_name, file_name_in_repo, commit_messag
     try:
         g = Github(GITHUB_TOKEN)
         repo = g.get_repo(repo_name)
-
         with open(file_path, 'rb') as file:
             content = file.read()
 
         path = file_name_in_repo
-
         try:
             contents = repo.get_contents(path)
             repo.update_file(path, commit_message, content, contents.sha)
             st.info(f"{file_name_in_repo} を更新しました。")
-        except Exception as e_inner:
+        except:
             repo.create_file(path, commit_message, content)
             st.info(f"{file_name_in_repo} を作成しました。")
-    except Exception as e_outer:
-        st.error(f"GitHubへのファイルアップロード中にエラーが発生しました: {e_outer}")
-        st.error(f"詳細: {e_outer.args}")
+    except Exception as e:
+        st.error(f"GitHubへのファイルアップロード中にエラーが発生しました: {e}")
 
 def extract_data_and_save_to_csv(html_path, output_csv_path, date):
     with open(html_path, "r", encoding="utf-8") as file:
@@ -168,29 +165,22 @@ def process_juggler_data(html_path, output_csv_dir, excel_path, date):
     apply_color_fill_to_excel(excel_path)
 
     print(f"データ処理が完了し、{excel_path} に保存されました")
+    return output_csv_path, excel_path  # 作成したファイルのパスを返す
 
-# CSVとExcelファイルを両方ダウンロード可能にする
-def display_download_buttons(output_csv_path, excel_path):
-    # CSVファイルのダウンロードボタンを表示
-    if os.path.exists(output_csv_path):
-        with open(output_csv_path, "rb") as f:
-            st.download_button(
-                label="CSVファイルをダウンロード",
-                data=f.read(),
-                file_name=os.path.basename(output_csv_path),
-                mime="text/csv",
-                key="csv_download_button"
-            )
-    # Excelファイルのダウンロードボタンを表示
-    if os.path.exists(excel_path):
-        with open(excel_path, "rb") as f:
-            st.download_button(
-                label="Excelファイルをダウンロード",
-                data=f.read(),
-                file_name=excel_path,
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                key="excel_download_button"
-            )
+# CSVとExcelファイルを両方ダウンロード可能にする関数
+def display_download_buttons(output_csv, excel_file):
+    st.download_button(
+        label="CSVファイルをダウンロード",
+        data=output_csv,
+        file_name="output.csv",
+        mime="text/csv"
+    )
+    st.download_button(
+        label="Excelファイルをダウンロード",
+        data=excel_file,
+        file_name="output.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
 
 # シークレットからGitHubトークンを取得
 GITHUB_TOKEN = st.secrets["github"]["token"]
@@ -256,29 +246,27 @@ st.sidebar.markdown(
 st.sidebar.markdown('<div class="sidebar-title">📋 入力パラメータ</div>', unsafe_allow_html=True)
 st.sidebar.markdown('<div class="sidebar-section">HTMLファイルの入力方法を選択してください</div>', unsafe_allow_html=True)
 
-input_option = st.sidebar.radio("HTMLの入力方法を選択", ('ファイルをアップロード', 'HTMLを貼り付け'), index=1)
+input_option = st.sidebar.radio("HTMLの入力方法を選択", ('ファイルをアップロード', 'HTMLを貼り付け'))
 
 if input_option == 'ファイルをアップロード':
-    st.sidebar.markdown('<div class="sidebar-section">HTMLファイルをアップロードしてください。</div>', unsafe_allow_html=True)
-    uploaded_html = st.sidebar.file_uploader("HTMLファイルをアップロード", type=["html", "htm", "txt"])
+    uploaded_html = st.sidebar.file_uploader("HTMLファイルをアップロード", type=["html", "htm"])
     html_content = None
 else:
-    st.sidebar.markdown('<div class="sidebar-section">HTMLを貼り付けてください。貼り付け後に Ctrl + Enter を押してください。</div>', unsafe_allow_html=True)
     html_content = st.sidebar.text_area("HTMLを貼り付け", height=300)
     uploaded_html = None
 
-st.sidebar.text_input("CSVファイルの保存フォルダ名", "マイジャグラーV", disabled=True)
 excel_file_name = st.sidebar.text_input("Excelファイル名", "マイジャグラーV_塗りつぶし済み.xlsx")
 date_input = st.sidebar.date_input("日付を選択", current_date_japan)
+
 confirm_date = st.sidebar.checkbox(f"選択した日付は {date_input} です。確認しましたか？")
 
-if os.path.exists(excel_file_name):
-    df_synthetic = load_excel_data(excel_file_name)
-    machine_numbers = df_synthetic.index.tolist()
-    selected_machine_number = st.sidebar.selectbox("台番号を選択", machine_numbers)
-    if selected_machine_number:
-        plot_synthetic_probabilities(df_synthetic, selected_machine_number)
+# ダウンロードボタンの保持のため、ファイルをメモリに保存
+if 'output_csv' not in st.session_state:
+    st.session_state['output_csv'] = None
+if 'excel_file' not in st.session_state:
+    st.session_state['excel_file'] = None
 
+# 処理開始ボタンが押されたら処理を実行
 if st.sidebar.button("処理開始"):
     if confirm_date:
         if uploaded_html or html_content:
@@ -295,23 +283,14 @@ if st.sidebar.button("処理開始"):
                 os.makedirs("マイジャグラーV")
 
             date_str = date_input.strftime("%Y-%m-%d")
+            output_csv_path, excel_file_path = process_juggler_data(html_path, "マイジャグラーV", excel_file_name, date_str)
 
-            try:
-                process_juggler_data(html_path, "マイジャグラーV", excel_file_name, date_str)
-                st.success(f"データ処理が完了し、{excel_file_name} に保存されました。")
+            # ファイルをメモリに保持して再ダウンロード可能に
+            st.session_state['output_csv'] = download_file(output_csv_path)
+            st.session_state['excel_file'] = download_file(excel_file_path)
 
-                output_csv_path = os.path.join("マイジャグラーV", f"slot_machine_data_{date_str}.csv")
-                display_download_buttons(output_csv_path, excel_file_name)
+            st.success("データ処理が完了しました。")
 
-                repo_name = "yudai4452/data-processor-app"
-                commit_message = f"Add data for {date_str}"
-
-                upload_file_to_github(output_csv_path, repo_name, f"マイジャグラーV/slot_machine_data_{date_str}.csv", commit_message)
-                upload_file_to_github(excel_file_name, repo_name, f"{excel_file_name}", commit_message)
-
-            except Exception as e:
-                st.error(f"エラーが発生しました: {e}")
-        else:
-            st.warning("HTMLファイルをアップロードするか、HTMLを貼り付けてください。")
-    else:
-        st.warning("日付の確認を行ってください。")
+# すでに処理済みファイルがあればダウンロードボタンを表示
+if st.session_state['output_csv'] and st.session_state['excel_file']:
+    display_download_buttons(st.session_state['output_csv'], st.session_state['excel_file'])
